@@ -5,6 +5,7 @@ import java.security.spec.KeySpec;
 import java.util.Base64;
 
 public class HashPassword{
+    //Step 1 - Create constant eg. Algorith
     private static String ALGORITHM = "PBKDF2withHmacSHA512";
     private static final int Iteraction = 65536;
     private static final int KEY_LENGTH = 512;
@@ -12,10 +13,12 @@ public class HashPassword{
 
     public String hashPassword(String password) throws Exception{
 
+        //Step 2 - generate a random salt
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[SALT_LENGTH];
         random.nextBytes(salt);
 
+        //Step 3 - Create a Key specification
         KeySpec spec = new PBEKeySpec(
                 password.toCharArray(),
                 salt,
@@ -24,12 +27,15 @@ public class HashPassword{
 
         );
 
+        //Step 3 - Generate the Hash
         SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
         byte[] hash = factory.generateSecret(spec).getEncoded();
 
+        //Step 4 - Encode Salt and Hash
         String saltBase64 = Base64.getEncoder().encodeToString(salt);
         String hashBase64 = Base64.getEncoder().encodeToString(hash);
 
+        //Return a combined String for easy storage
         return String.format("%s:%s:%d:%d", saltBase64,hashBase64,Iteraction,KEY_LENGTH);
     }
 
